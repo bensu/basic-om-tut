@@ -1,7 +1,12 @@
 This tutorial assumes familiarity with Clojure or ClojureScript. If
 you are not familiar with them, we recommend going through the
 [ClojureScript tutorial for Light Table](http://github.com/swannodette/lt-cljs-tutorial)
-first.
+first. We will use [Chestnut](https://github.com/plexus/chestnut) to
+easily get an interactive environment for Om. Chestnut comes with 2
+things besides Om:
+
+- [Figwheel](https://github.com/bhauman/lein-figwheel): A plugin that automatically reloads your ClojureScript and CSS as soon as you save the file, no need for browser refresh.
+- [Weasel](https://github.com/tomjakubowski/weasel): Browser connected REPL to try things out and manipulate your running app.
 
 Install [Leiningen](http://leiningen.org). Then
 run the following where you like on the command line:
@@ -18,23 +23,24 @@ lein repl
 ```
 
 This will start a REPL in the `app.server` namespace, which contains
-the function `run` from Chestnut. It will start auto building so that
-recompiles will occur when you save a file. It will also send all the
-compiled changes to the browser so you don't need to refresh on each
-change. Use it on the REPL:
+the function `run` from Chestnut. It will call Fighwheel and start
+auto building so that recompiles will occur when you save a file. It
+will also send all the compiled changes to the browser so you don't
+need to refresh on each change. Use `run` on the REPL:
 
 ```clj
 om-tut.server=> (run)
 ```
 
 The first build will take a few seconds. Once the build has succeeded
-open `localhost:10555` in your favorite browser (we recommend Google
-Chrome as it has excellent support for source maps). You should see an
-`h1` tag with the text content `Hello Chestnut!` in it.
+open [localhost:10555](http://localhost:10555) in your favorite
+browser (we recommend Google Chrome as it has excellent support for
+source maps). You should see an `h1` tag with the text content `Hello
+Chestnut!` in it.
 
 Open `src/cljs/om_tut/core.cljs` in your preferred editor. Change
 `:text` value of `app-state` to be something else other than `Hello
-World!`. Save the file. Refresh your browser and you should see the
+Chestnut!`. Save the file. Refresh your browser and you should see the
 new contents. The reason we need to refresh the browser is because
 `app-state` is defined with `defonce`. This is meant to prevent each
 reload from reseting the state. 
@@ -47,8 +53,8 @@ Now change `dom/h1` to `dom/p` and watch the browser window. It should
 change without the need for reloading. This changed the behavior of
 the code without affecting `app-state`. To edit `app-state` you can
 either refresh the browser to reset it, or manipulate it directly from
-a browser-connected-repl. To get it, call the following function from
-the REPL:
+a browser-connected-REPL. To get Weasel's Browser REPL, call the
+following function from the Clojure REPL:
 
 ```clj
 om-tut.server=> (browser-repl)
