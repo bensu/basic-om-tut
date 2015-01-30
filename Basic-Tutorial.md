@@ -62,13 +62,14 @@ Now you have a ClojureScript REPL, but the browser might not be
 connected to it. Refresh the browser and then try:
 
 ```clj
-cljs.user=> (+ 1 1)
+cljs.user=> (js/alert "Am I connected?")
 ```
 
-You should see `2`. If you see exceptions and error messages , please
-troubleshoot Chestnut's browser REPL before proceeding. If everything
-is working move from the generic `cljs.user` namespace to
-`om-tut.core` and then change the state:
+You should see the alert in your browser. After you click "Ok" in the
+browser, the expression should return `nil` in the REPL. If you see
+exceptions and error messages , please troubleshoot Chestnut's browser
+REPL before proceeding. If everything is working move from the generic
+`cljs.user` namespace to `om-tut.core` and then change the state:
 
 ```clj
 cljs.user=> (in-ns 'om-tut.core)
@@ -82,7 +83,7 @@ In Om the application state is held in an `atom`, the one reference
 type built into ClojureScript. If you change the value of the atom via
 `swap!` or `reset!` this will always trigger a re-render of any Om
 roots attached to it (we'll explain this in a second). You can think
-of this atom as the database of your client side
+of this atom as the database of your client side 
 application. Everything in the atom should be an associative data
 structure - either a ClojureScript map or indexed sequential data
 structure such as a vector (but not a set). This means you should never put lists or lazy
@@ -98,7 +99,8 @@ expression in the tutorial at this point looks like this:
 ```clj
 (om/root
   (fn [app owner]
-    (reify om/IRender
+    (reify
+      om/IRender
       (render [_]
         (dom/h1 nil (:text app)))))
   app-state
@@ -106,14 +108,16 @@ expression in the tutorial at this point looks like this:
 ```
 
 `om.core/root` is idempotent; that is, it's safe to evaluate it
-multiple times. It takes three arguments. The first argument is a function 
-that takes the application state data and the backing React component, here
-called `owner`. This function must return an Om component - i.e. a model of the `om/IRender` interface, like `om.core/component` macro generates. The second argument 
-is the application state atom. The third argument 
+multiple times (that is why we don't need `defonce`). It takes three
+arguments. The first argument is a function that takes the application
+state data and the backing React component, here called `owner`. This
+function must return an Om component - i.e. a model of the
+`om/IRender` interface, like `om.core/component` macro generates. The
+second argument  is the application state atom. The third argument 
 is a map; it must contain a `:target` DOM node key value pair. It also
 takes other interesting options which will be covered later.
 
-There can be multiple roots. Edit the `index.html`, replace `<div
+There can be multiple roots. Edit `resources/index.html`, replace `<div
 id="app"></div>` with the following:
 
 ```html
@@ -121,7 +125,7 @@ id="app"></div>` with the following:
 <div id="app1"></div>
 ```
 
-And edit `src/om_tut/core.cljs` replacing the `om/root` expression
+And edit `src/cljs/om_tut/core.cljs` replacing the `om/root` expression
 with the following:
 
 ```clj
@@ -144,13 +148,12 @@ one to look like the following:
   {:target (. js/document (getElementById "app1"))}) ;; <-- "app0" to "app1"
 ```
 
-Place your cursor at the end of this expression and evaluate it. You
-should see the second `h2` tag magically appear.
+You should see the second `h2` tag magically appear after saving.
 
-At the end of the file type the following and evaluate it.
+Evaluate this at the REPL:
 
 ```clj
-(swap! app-state assoc :text "Multiple roots!")
+om-tut.core=> (swap! app-state assoc :text "Multiple roots!")
 ```
 
 You should see both `h2` tags update on the fly. Multiple roots are
@@ -158,22 +161,20 @@ fully supported and synchronized to render on the same
 `requestAnimationFrame`.
 
 Before proceeding remove the `<div id="app1"></div>` from
-`index.html` and remove the second `om/root` expression and the
-`swap!` expression. Save and refresh the browser.
+`resources/index.html` and remove the second `om/root` expression. Save and
+refresh the browser.
 
 ## Rendering a list of things
 
-Change the `app-state` expression to the following and evaluate
-it. Don't bother refreshing,
-[John McCarthy](http://library.stanford.edu/collections/john-mccarthy-papers-0)
-would be pissed!
+Change the `app-state` expression to the following and refresh the browser:
 
 ```clj
-(def app-state (atom {:list ["Lion" "Zebra" "Buffalo" "Antelope"]}))
+(defonce app-state (atom {:list ["Lion" "Zebra" "Buffalo" "Antelope"]}))
 ```
 
-Change the `om/root` expression to the following and evaluate it. You
-should see a list of animals now.
+Change the `om/root` expression to the following and save. Don't bother refreshing,
+[John McCarthy](http://library.stanford.edu/collections/john-mccarthy-papers-0)
+would be pissed! You should see a list of animals now.
 
 ```clj
 (om/root
@@ -242,9 +243,7 @@ helper function `stripe` before the `om/root` expression:
     (dom/li #js {:style st} text)))
 ```
 
-Don't forget to evaluate it!
-
-Then change the `om/root` expression to the following and evaluate it:
+Then change the `om/root` expression to the following and save:
 
 ```clj
 (om/root
@@ -262,9 +261,9 @@ most templating languages completely to shame.
 ## Your first Om component
 
 Change `<div id="app0"></div>` to `<div id="contacts"></div>`, remove
-`stripe` from `src/om_tut/core.cljs` and refresh your browser.
+`stripe` from `src/om_tut/core.cljs` and save.
 
-Change the `om/root` expression to the following, don't evaluate it
+Change the `om/root` expression to the following, don't save it
 yet since we haven't defined `contacts-view`.
 
 ```clj
@@ -275,7 +274,7 @@ yet since we haven't defined `contacts-view`.
 Let's edit `app-state` so it looks like this:
 
 ```clj
-(def app-state
+(defonce app-state
   (atom
     {:contacts
      [{:first "Ben" :last "Bitdiddle" :email "benb@mit.edu"}
@@ -316,7 +315,9 @@ Let's write `contact-view` now and add it after `contacts-view`.
       (dom/li nil (display-name contact)))))
 ```
 
-Now save the file and reload the browser. You'll see a blank page. Let's check the results in the `lein cljsbuild auto` terminal window to see what happened:
+Now save the file and reload the browser. You'll see a blank page.
+Let's check the outout of the compilation process in the terminal window
+to see what happened: 
 
 ```
 Compiling "om_tut.js" from ["src"]...
@@ -349,10 +350,7 @@ in your file.
 
 Again some map destructuring.
 
-Let's start evaling code!
-
-Eval each form one by one. When you hit the
-final form you should see the list of contacts.
+After you save you should see the list of contacts.
 
 ## Enhancing your first Om component
 
@@ -368,7 +366,7 @@ Let's try deleting contacts. Change `contact-view` to the following:
         (dom/button nil "Delete")))))
 ```
 
-Evaluate this and the `om/root` expression. You should see delete
+Save it. You should see delete
 buttons now, however clicking on them won't do anything.
 
 Contacts don't need to be able to delete themselves, however they should
@@ -377,7 +375,21 @@ be able to communicate to some entity that does have that power.
 ## Intercomponent communication
 
 For communication between components we will use core.async
-channels. Change your namespace form to the following:
+channels. First add core.async as a project dependency in
+`project.clj`:
+
+```clj
+(defproject om-tut "0.1.0-SNAPSHOT"
+  ...
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [org.clojure/clojurescript "0.0-2371" :scope "provided"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"] ;; <- Add this
+                 [ring "1.3.1"]
+                 ...]
+  ...)
+```
+
+Then, change your namespace form to the following:
 
 ```clj
 (ns om-tut.core
@@ -388,8 +400,8 @@ channels. Change your namespace form to the following:
 ```
 
 Save your file and refresh the browser. (Note: as we have changed
-the namespace form you will need to stop/restart the 
-```lein cljsbuild auto om-tut``` process). Change `contact-view` to the
+the namespace form and added a dependency in `project.clj` you will
+need to stop/restart the ```lein repl``` process). Change `contact-view` to the
 following:
 
 ```clj
@@ -399,7 +411,7 @@ following:
     (render-state [this {:keys [delete]}]
       (dom/li nil
         (dom/span nil (display-name contact))
-        (dom/button #js {:onClick (fn [e] (put! delete contact))} "Delete")))))
+        (dom/button #js {:onClick (fn [e] (put! delete @contact))} "Delete")))))
 ```
 
 We've changed `om/IRender` to `om/IRenderState`. This is because we
