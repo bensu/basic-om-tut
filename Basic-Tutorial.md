@@ -1,7 +1,4 @@
-This tutorial is optimized for usage with
-[Light Table](http://www.lighttable.com/).
-
-It also assumes familiarity with Clojure or ClojureScript. If
+This tutorial assumes familiarity with Clojure or ClojureScript. If
 you are not familiar with them, we recommend going through the
 [ClojureScript tutorial for Light Table](http://github.com/swannodette/lt-cljs-tutorial)
 first.
@@ -10,56 +7,74 @@ Install [Leiningen](http://leiningen.org). Then
 run the following where you like on the command line:
 
 ```
-lein new mies-om om-tut
+lein new chestnut om-tut
 ```
 
 This will create a folder called `om-tut`. `cd` into it and run the
 following command:
 
 ```
-lein cljsbuild auto om-tut
+lein repl 
 ```
 
-This will start auto building so that recompiles will occur when you
-save a file. The first build will take a few seconds. Once the build
-has succeeded open `index.html` in your favorite browser (we recommend
-Google Chrome as it has excellent support for source maps). You should
-see an `h1` tag with the text content `Hello World!` in it.
-
-Open `src/om_tut/core.cljs` in Light Table. Change `:text` value of
-`app-state` to be something else other than `Hello World!`. Save the
-file. Refresh your browser and you should see the new contents.
-
-That's pretty boring isn't it? Let's do some live coding instead.
-
-Type the key chord `Control-SPACE` to open up the command list. Start
-typing `Add Connection`, press enter to select it. In the list of
-options select **Browser (External)**. Copy and paste the script tag
-into `index.html` before the `<div id="app"></div>`.
-
-Open the JavaScript Console. You can do this via the Chrome menu
-selection **View > Developer > JavaScript**. Open the console settings
-by clicking on the gear icon in the top right of the console. Select
-the **General** settings pane and check the "Log XMLHttpRequests"
-option. Refresh your browser, if everything went well you should see
-`XHR finished loading ...` in the console. Now arrange your windows so
-that you can see both the Chrome window and your source code at the
-same time.
-
-Now at the bottom of the `src/om_tut/core.cljs` source file write the
-following:
+This will start a REPL in the `app.server` namespace, which contains
+the function `run` from Chestnut. It will start auto building so that
+recompiles will occur when you save a file. It will also send all the
+compiled changes to the browser so you don't need to refresh on each
+change. Use it on the REPL:
 
 ```clj
-(swap! app-state assoc :text "Do it live!")
+om-tut.server=> (run)
 ```
 
-Place your cursor at the end of the expression and type the key chord
-`Command-ENTER` to evaluate it. Again it will take a second to make the
-initial connection. After the connection is made and the application
-is updated, edit the string again, re-evaluate and you will see that
-updating the application on the fly is pretty snappy.
+The first build will take a few seconds. Once the build has succeeded
+open `localhost:10555` in your favorite browser (we recommend Google
+Chrome as it has excellent support for source maps). You should see an
+`h1` tag with the text content `Hello Chestnut!` in it.
 
-Before proceeding remove the `swap!` expression.
+Open `src/cljs/om_tut/core.cljs` in your preferred editor. Change
+`:text` value of `app-state` to be something else other than `Hello
+World!`. Save the file. Refresh your browser and you should see the
+new contents. The reason we need to refresh the browser is because
+`app-state` is defined with `defonce`. This is meant to prevent each
+reload from reseting the state. 
+
+That's pretty boring isn't it? Let's do some live coding instead.
+Arrange your windows so that you can see both the Chrome window 
+and your source code at the same time.
+
+Now change `dom/h1` to `dom/p` and watch the browser window. It should
+change without the need for reloading. This changed the behavior of
+the code without affecting `app-state`. To edit `app-state` you can
+either refresh the browser to reset it, or manipulate it directly from
+a browser-connected-repl. To get it, call the following function from
+the REPL:
+
+```clj
+om-tut.server=> (browser-repl)
+<< started Weasel server on ws://0.0.0.0:9001 >>
+Type `:cljs/quit` to stop the ClojureScript REPL
+nil
+cljs.user=>
+```
+
+Now you have a ClojureScript REPL, but the browser might not be
+connected to it. Refresh the browser and then try:
+
+```clj
+cljs.user=> (+ 1 1)
+```
+
+You should see `2`. If you see exceptions and error messages , please
+troubleshoot Chestnut's browser REPL before proceeding. If everything
+is working move from the generic `cljs.user` namespace to
+`om-tut.core` and then change the state:
+
+```clj
+cljs.user=> (in-ns 'om-tut.core)
+om-tut.core
+om-tut.core=> (swap! app-state assoc :text "Do it live!")
+```
 
 ## Om basics
 
