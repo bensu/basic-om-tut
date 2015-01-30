@@ -465,7 +465,7 @@ contact list.
 ## Adding Contacts
 
 Let's modify our application so we can add new contacts. Change the
-top namespace form to the following and refresh your browser:
+top namespace form to the following, restart `lein repl`, and refresh your browser:
 
 ```clj
 (ns om-tut.core
@@ -477,7 +477,7 @@ top namespace form to the following and refresh your browser:
             [clojure.string :as string]))
 ```
 
-Let's add a new function called `parse-contact`. Evaluate it.
+Let's add a new function called `parse-contact` and save it.
 
 ```clj
 (defn parse-contact [contact-str]
@@ -502,12 +502,14 @@ Try it on some input!
 (parse-contact "Gerald J. Sussman")
 ```
 
-If Light Table throws a ReferenceError with the message `clojure is not defined` or `string is not defined`, shut down the compiler. Entering the command:
+If Figwheel throws a ReferenceError with the message `clojure is not
+defined` or `string is not defined`, shut down the REPL. Then enter the command:
 
 ```
-lein do cljsbuild clean, cljsbuild auto om-tut
-``` 
-...and refreshing the browser will clear the problem.
+lein cljsbuild clean
+```
+
+... restarting the REPL and refreshing the browser will clear the problem.
 
 Once you've seen that it basically works lets write `add-contact`, it
 should look like the following:
@@ -554,9 +556,8 @@ should look like the following:
 Notice that the input field specified `:ref`, this is a feature of
 React for the few cases where you need direct access to a DOM node.
 
-Re-evaluate `contacts-view` and the `om/root` form. You should now be
-able to add contacts as long as you provide at least a first and last
-name.
+Save the file. You should now be able to add contacts as long as you
+provide at least a first and last name.
 
 This is a lot of information. As a challenge I recommend trying to
 clear the text field when a real contact has been added. This is
