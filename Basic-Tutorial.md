@@ -587,8 +587,7 @@ same thing could be accomplished in a more declarative manner.
 
 Since `contacts-view` "owns" the text field we should consider making
 its value a part of `contacts-view`'s local state. Let's change
-`contacts-view` to the following, evaluate it and re-evaluate the
-`om/root` expression:
+`contacts-view` to the following and save it:
 
 ```clj
 (defn contacts-view [app owner]
@@ -657,7 +656,7 @@ event listener to watch when the input field changes:
           (dom/button #js {:onClick #(add-contact app owner)} "Add contact"))))))
 ```
 
-Before evaluating that let's add `handle-change` before `contacts-view`:
+Before saving it that let's add `handle-change` before `contacts-view`:
 
 ```clj
 (defn handle-change [e owner {:keys [text]}]
@@ -710,7 +709,7 @@ input and other complications for now. As a challenge you should try
 to re-add these facilities yourself after you've worked through this
 section.
 
-Let's start fresh. Your `index.html` should look like the following, don't
+Let's start fresh. Your `resources/index.html` should look like the following, don't
 forget to include Light Table's connection script tag:
 
 ```html
