@@ -853,30 +853,31 @@ multiple locations on the screen.
 
 ## Interactivity & Higher Order Components
 
-Let's change `index.html` to the following, again don't forget to
-include the LT connection script tag:
+Let's change `resources/index.html` to the following:
 
 ```html
+<!DOCTYPE html>
 <html>
-    <head>
-        <style>
-            ul li input {
-                width: 400px;
-            }
-            ul li button {
-                margin-left: 10px;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="registry"></div>
-        <div id="classes"></div>
-        <script src="http://fb.me/react-0.12.2.js"></script>
-        <script src="out/goog/base.js" type="text/javascript"></script>
-        <script src="om_tut.js" type="text/javascript"></script>
-        <script type="text/javascript">goog.require("om_tut.core");</script>
-    </body>
+  <head>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="registry"></div>
+    <div id="classes"></div>
+    <script src="/js/app.js" type="text/javascript"></script>
+  </body>
 </html>
+```
+
+and `resources/public/style.css` to:
+
+```css
+ul li input {
+    width: 400px;
+}
+ul li button {
+    margin-left: 10px;
+}
 ```
 
 Let's add `classes-view` after `registry-view`:
@@ -900,8 +901,7 @@ one:
   {:target (. js/document (getElementById "classes"))})
 ```
 
-Evaluate the new forms and both `om/root` expressions, you should see
-the new bits of UI.
+Save all the files, you should see the new bits of UI.
 
 Let's make class names editable inline. To accomplish this we want to
 make a reusable component that we can plug in wherever we like. This
@@ -1027,9 +1027,9 @@ Let's use `editable` in `classes-view`:
           (om/build-all editable (vals (:classes app))))))))
 ```
 
-That's it, evaluate everything or refresh the browser. You should now
-be able to edit class titles in the `classes-view`. Notice that the
-class titles in `registry-view` stay perfectly in sync.
+That's it, save it. You should now be able to edit class titles in the
+`classes-view`. Notice that the class titles in `registry-view` stay
+perfectly in sync.
 
 As a challenge render the classes in `professor-view` with `editable`
 instead of just rendering strings. It's just a one line change. If you
