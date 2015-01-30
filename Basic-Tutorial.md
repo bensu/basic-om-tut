@@ -709,18 +709,19 @@ input and other complications for now. As a challenge you should try
 to re-add these facilities yourself after you've worked through this
 section.
 
-Let's start fresh. Your `resources/index.html` should look like the following, don't
-forget to include Light Table's connection script tag:
+Let's start fresh. Your `resources/index.html` should look like the
+following, don't forget to include Light Table's connection script tag:
 
 ```html
+<!DOCTYPE html>
 <html>
-    <body>
-        <div id="registry"></div>
-        <script src="http://fb.me/react-0.12.2.js"></script>
-        <script src="out/goog/base.js" type="text/javascript"></script>
-        <script src="om_tut.js" type="text/javascript"></script>
-        <script type="text/javascript">goog.require("om_tut.core");</script>
-    </body>
+  <head>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="registry"></div>
+    <script src="/js/app.js" type="text/javascript"></script>
+  </body>
 </html>
 ```
 
@@ -766,8 +767,9 @@ Your source file should look like the following:
       (dom/div nil
         (dom/h2 nil "Registry")))))
 
-(om/root registry-view app-state
-  {:target (. js/document (getElementById "registry"))})
+(defn main []
+  (om/root registry-view app-state
+    {:target (. js/document (getElementById "registry"))}))
 ```
 
 Now what we want is for `registry-view` to render different views for
@@ -786,7 +788,7 @@ After `display-name` let's write the following:
   [person owner] (professor-view person owner)) 
 ```
 
-Don't evaluate these yet as we haven't written `student-view` or
+Don't save these yet as we haven't written `student-view` or
 `professor-view`. Take a moment to let the idea sink, we're adding a
 level of indirection so that `entry-view` can delegate to any other
 view as long as we supplied a `defmethod` for it!
@@ -839,7 +841,7 @@ titles. Before `registry-view` write the following:
                x)))))
 ```
 
-Evaluate everything and you should see the results.
+Save everything and you should see the results.
 
 Hopefully the view composition and extensibility offered by Om puts
 a gleam in your eye. There's more than enough here to keep you occupied for
