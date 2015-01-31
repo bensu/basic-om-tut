@@ -2,8 +2,8 @@ This tutorial assumes familiarity with Clojure or ClojureScript. If
 you are not familiar with them, we recommend going through the
 [ClojureScript tutorial for Light Table](http://github.com/swannodette/lt-cljs-tutorial)
 first. We will use [Chestnut](https://github.com/plexus/chestnut) to
-easily get an interactive environment for Om. Chestnut comes with 2
-things besides Om:
+easily get an interactive environment for ClojureScript and Om.
+Chestnut comes with 2 things besides Om:
 
 - [Figwheel](https://github.com/bhauman/lein-figwheel): A plugin that automatically reloads your ClojureScript and CSS as soon as you save the file, no need for browser refresh.
 - [Weasel](https://github.com/tomjakubowski/weasel): Browser connected REPL to try things out and manipulate your running app.
@@ -73,9 +73,10 @@ cljs.user=> (js/alert "Am I connected?")
 
 You should see the alert in your browser. After you click "Ok" in the
 browser, the expression should return `nil` in the REPL. If you see
-exceptions and error messages , please troubleshoot Chestnut's browser
+exceptions and error messages , please troubleshoot Chestnut's Browser
 REPL before proceeding. If everything is working move from the generic
-`cljs.user` namespace to `om-tut.core` and then change the state:
+`cljs.user` namespace to `om-tut.core` (where all our code lives) and
+then change the state:
 
 ```clj
 cljs.user=> (in-ns 'om-tut.core)
