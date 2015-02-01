@@ -4,15 +4,16 @@ you are not familiar with them, we recommend going through the
 first. We will use
 [Figwheel](https://github.com/bhauman/lein-figwheel) to 
 easily get an interactive environment for ClojureScript and Om.
-Figwheel does 2 things:
+Figwheel does two things:
 
 - It automatically compiles and reloads your ClojureScript and CSS in
-  the browser as soon as you save the file, no need for refresh.
-- It connects the browser to a REPL so you can try things out and
+  the browser as soon as you save the file, no need to refresh.
+- It connects the browser to a REPL so you can try expressions and
   manipulate your running app. 
 
 To get started, install [Leiningen](http://leiningen.org). Then
-run the following where you like on the command line:
+navigate in a terminal to the directory where you would like the tutorial
+and run the following command:
 
 ```
 lein new figwheel om-tut -- --om
@@ -25,19 +26,19 @@ called `om-tut`. `cd` into it and run the following command:
 lein figwheel 
 ```
 
-It will start auto building the Clojurescript project. The first build
+It will start auto building the ClojureScript project. The first build
 will take a few seconds. Once the build has succeeded 
 open [localhost:3449](http://localhost:3449/) in your favorite
 browser (we recommend Google Chrome as it has excellent support for
 source maps). You should see an `h1` tag with the text content `Hello
 World!` in it.
 
-Open `src/om_tut/core.cljs` in your preferred editor. Change
+Open `src/om_tut/core.cljs` in your preferred editor. Change the
 `:text` value of `app-state` to be something else other than `Hello
 World!`. Save the file. Refresh your browser and you should see the
 new contents. The reason we need to refresh the browser is because
 `app-state` is defined with `defonce`. This is meant to prevent each
-reload from reseting the state. 
+reload from resetting the state. 
 
 That's pretty boring isn't it? Let's do some live coding instead.
 Arrange your windows so that you can see both the Chrome window 
@@ -48,9 +49,8 @@ change without the need for reloading. This changed the behavior of
 the code without affecting `app-state`. To edit `app-state` you can
 either refresh the browser to reset it, or manipulate it directly from
 the browser-connected-REPL. In the same terminal window where you
-entered `lein figwheel` you should see a REPL. If you don't try
-refreshing your browser window at
-[localhost:3449](http://localhost:3449/). An easy way to try the REPL is:
+entered `lein figwheel` you should see a REPL. If you don't, try
+refreshing your browser window. An easy way to try the REPL is:
 
 ```clj
 ClojureScript:cljs.user> (js/alert "Am I connected?")
@@ -145,7 +145,7 @@ one to look like the following:
 
 You should see the second `h2` tag magically appear after saving.
 
-Evaluate this at the REPL:
+Evaluate this in the REPL:
 
 ```clj
 ClojureScript:om-tut.core=> (swap! app-state assoc :text "Multiple roots!")
@@ -183,7 +183,7 @@ would be pissed! You should see a list of animals now.
 
 You might have noticed that the first argument to `dom/ul` and
 `dom/li` is `nil`. This argument is how you set DOM attributes. Change
-the `om/root` expression to the following and evaluate it:
+the `om/root` expression to the following and save it:
 
 ```clj
 (om/root
@@ -645,8 +645,8 @@ Before saving it that let's add `handle-change` before `contacts-view`:
   (om/set-state! owner :text (.. e -target -value)))
 ```
 
-Now evaluate `handle-change`, `contacts-view` and `om/root`. You
-should now be able to type in the text field again.
+Now save all the changes. You should now be able to type in the text
+field again.
 
 Let's finally add the piece of code that clears the text field. As you see it looks like our first "easy" attempt, except that we're no longer directly manipulating a ref but we're changing the state of the app:
 
@@ -673,9 +673,8 @@ a name can't have a number in it, let's prevent that now by modifying
       (om/set-state! owner :text text))))
 ```
 
-Evaluate `handle-change`, `contact-view`, and `om/root`. You can type
-names however no change will occur if you attempt to enter a
-number. Pretty slick.
+Now save. You can type names however no change will occur if you
+attempt to enter a number. Pretty slick.
 
 **Note**: If you are familiar with React you'll notice that this is a
 little bit clunkier than in React, here we have to make sure to set
