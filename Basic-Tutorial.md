@@ -950,10 +950,22 @@ JavaScript primitive strings are not the same thing:
   (-value [s] (str s)))
 ```
 
-The ClojureScript compiler will emit a warning. Normally you don't
-want to ignore it but in this case we'll make an exception in order to
-keep the `editable` component as simple as possible. We'll explain
-`IValue` in a moment.
+We'll explain `IValue` in a moment. The ClojureScript compiler will
+emit a warning. Normally you don't want to ignore it but in this case
+we'll make an exception in order to keep the `editable` component as
+simple as possible. Since Figwheel doesn't reload code with warnings
+by default replace the call to Figwheel in `src/om_tut/core.cljs` to:
+
+```clj
+(fw/start {
+           :load-warninged-code true  ;; <- Add this
+           :on-jsload (fn []
+                        ;; (stop-and-start-my app)
+                        )})
+```
+
+Now refresh the browser. If you are still unable to load the code, do
+`lein clean` and restart `lein figwheel`.
 
 This is the editable component; this might look like a lot but take a
 moment to read it and you'll see that it's quite simple.
