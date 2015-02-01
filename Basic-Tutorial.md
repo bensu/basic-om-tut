@@ -64,9 +64,9 @@ REPL before proceeding. If everything is working move from the generic
 then change the state:
 
 ```clj
-cljs.user=> (in-ns 'om-tut.core)
+ClojureScript:cljs.user=> (in-ns 'om-tut.core)
 om-tut.core
-om-tut.core=> (swap! app-state assoc :text "Do it live!")
+ClojureScript:om-tut.core=> (swap! app-state assoc :text "Do it live!")
 ```
 
 ## Om basics
@@ -310,15 +310,13 @@ Let's write `contact-view` now and add it after `contacts-view`.
       (dom/li nil (display-name contact)))))
 ```
 
-Now save the file and reload the browser. You'll see a blank page.
-Let's check the outout of the compilation process in the terminal window
-to see what happened: 
+Now save the file and reload the browser. You'll see a blank page and
+some errors in the the browser console or in the same screen (look for
+the yellow message in the bottom) to see what happened:
 
 ```
-Compiling "om_tut.js" from ["src"]...
 WARNING: Use of undeclared Var om-tut.core/contact-view at line 24 src/om_tut/core.cljs
 WARNING: Use of undeclared Var om-tut.core/display-name at line 30 src/om_tut/core.cljs
-Successfully compiled "om_tut.js" in 0.072 seconds.
 ```
 
 It warns that `contact-view` is undefined, because it's defined *after* `contacts-view`. 
@@ -370,34 +368,20 @@ be able to communicate to some entity that does have that power.
 ## Intercomponent communication
 
 For communication between components we will use core.async
-channels. First add core.async as a project dependency in
-`project.clj`:
-
-```clj
-(defproject om-tut "0.1.0-SNAPSHOT"
-  ...
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2371" :scope "provided"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"] ;; <- Add this
-                 [ring "1.3.1"]
-                 ...]
-  ...)
-```
-
-Then, change your namespace form to the following:
+channels. Change your namespace form to the following:
 
 ```clj
 (ns om-tut.core
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true]
+  (:require [figwheel.client :as fw]
+    		[om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-```
+            [cljs.core.async :refer [put! chan <!]])) ```
 
 Save your file and refresh the browser. (Note: as we have changed
 the namespace form and added a dependency in `project.clj` you will
-need to stop/restart the ```lein repl``` process). Change `contact-view` to the
-following:
+need to stop/restart the ```lein figwheel``` process). Change
+`contact-view` to the following:
 
 ```clj
 (defn contact-view [contact owner]
@@ -460,12 +444,13 @@ contact list.
 ## Adding Contacts
 
 Let's modify our application so we can add new contacts. Change the
-top namespace form to the following, restart `lein repl`, and refresh your browser:
+top namespace form to the following, restart `lein figwheel`, and refresh your browser:
 
 ```clj
 (ns om-tut.core
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true]
+  (:require [figwheel.client :as fw]
+  			[om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs.core.async :refer [put! chan <!]]
             [clojure.data :as data]
@@ -501,7 +486,7 @@ If Figwheel throws a ReferenceError with the message `clojure is not
 defined` or `string is not defined`, shut down the REPL. Then enter the command:
 
 ```
-lein cljsbuild clean
+lein clean
 ```
 
 ... restarting the REPL and refreshing the browser will clear the problem.
@@ -705,7 +690,7 @@ to re-add these facilities yourself after you've worked through this
 section.
 
 Let's start fresh. Your `resources/public/index.html` should look like the
-following, don't forget to include Light Table's connection script tag:
+following: 
 
 ```html
 <!DOCTYPE html>
@@ -715,7 +700,9 @@ following, don't forget to include Light Table's connection script tag:
   </head>
   <body>
     <div id="registry"></div>
-    <script src="/js/app.js" type="text/javascript"></script>
+    <script src="js/compiled/out/goog/base.js" type="text/javascript"></script>
+    <script src="js/compiled/om_tut.js" type="text/javascript"></script>
+    <script type="text/javascript">goog.require("om-tut.core");</script>
   </body>
 </html>
 ```
@@ -724,7 +711,8 @@ Your source file should look like the following:
 
 ```clj
 (ns om-tut.core
-  (:require [om.core :as om :include-macros true]
+  (:require [figwheel.client :as fw]
+    		[om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [clojure.string :as string]))
 
@@ -859,7 +847,9 @@ Let's change `resources/public/index.html` to the following:
   <body>
     <div id="registry"></div>
     <div id="classes"></div>
-    <script src="/js/app.js" type="text/javascript"></script>
+    <script src="js/compiled/out/goog/base.js" type="text/javascript"></script>
+    <script src="js/compiled/om_tut.js" type="text/javascript"></script>
+    <script type="text/javascript">goog.require("om-tut.core");</script>
   </body>
 </html>
 ```
