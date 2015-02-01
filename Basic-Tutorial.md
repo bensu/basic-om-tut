@@ -148,7 +148,7 @@ You should see the second `h2` tag magically appear after saving.
 Evaluate this at the REPL:
 
 ```clj
-om-tut.core=> (swap! app-state assoc :text "Multiple roots!")
+ClojureScript:om-tut.core=> (swap! app-state assoc :text "Multiple roots!")
 ```
 
 You should see both `h2` tags update on the fly. Multiple roots are
@@ -310,9 +310,10 @@ Let's write `contact-view` now and add it after `contacts-view`.
       (dom/li nil (display-name contact)))))
 ```
 
-Now save the file and reload the browser. You'll see a blank page and
+Now save the file and reload the browser. You'll see no changes and
 some errors in the the browser console or in the same screen (look for
-the yellow message in the bottom) to see what happened:
+the yellow message in the bottom). Figwheel refuses to load code that
+has warnings. Go to the console: 
 
 ```
 WARNING: Use of undeclared Var om-tut.core/contact-view at line 24 src/om_tut/core.cljs
@@ -376,11 +377,12 @@ channels. Change your namespace form to the following:
   (:require [figwheel.client :as fw]
     		[om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [cljs.core.async :refer [put! chan <!]])) ```
+            [cljs.core.async :refer [put! chan <!]]))
+```
 
 Save your file and refresh the browser. (Note: as we have changed
 the namespace form and added a dependency in `project.clj` you will
-need to stop/restart the ```lein figwheel``` process). Change
+need to stop/restart the `lein figwheel` process). Change
 `contact-view` to the following:
 
 ```clj
@@ -489,7 +491,7 @@ defined` or `string is not defined`, shut down the REPL. Then enter the command:
 lein clean
 ```
 
-... restarting the REPL and refreshing the browser will clear the problem.
+... restarting Figwheel and refreshing the browser will clear the problem.
 
 Once you've seen that it basically works lets write `add-contact`, it
 should look like the following:
