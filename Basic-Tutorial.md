@@ -125,8 +125,8 @@ with the following:
 
 ```clj
 (om/root
-  (fn [app owner]
-    (om/component (dom/h2 nil (:text app))))
+  (fn [data owner]
+    (om/component (dom/h2 nil (:text data))))
   app-state
   {:target (. js/document (getElementById "app0"))})
 ```
@@ -137,8 +137,8 @@ one to look like the following:
 
 ```clj
 (om/root
-  (fn [app owner]
-    (om/component (dom/h2 nil (:text app))))
+  (fn [data owner]
+    (om/component (dom/h2 nil (:text data))))
   app-state
   {:target (. js/document (getElementById "app1"))}) ;; <-- "app0" to "app1"
 ```
@@ -173,10 +173,10 @@ would be pissed! You should see a list of animals now.
 
 ```clj
 (om/root
-  (fn [app owner]
+  (fn [data owner]
     (om/component 
       (apply dom/ul nil
-        (map (fn [text] (dom/li nil text)) (:list app)))))
+        (map (fn [text] (dom/li nil text)) (:list data)))))
   app-state
   {:target (. js/document (getElementById "app0"))})
 ```
@@ -187,10 +187,10 @@ the `om/root` expression to the following and save it:
 
 ```clj
 (om/root
-  (fn [app owner]
+  (fn [data owner]
     (om/component 
       (apply dom/ul #js {:className "animals"}
-        (map (fn [text] (dom/li nil text)) (:list app)))))
+        (map (fn [text] (dom/li nil text)) (:list data)))))
   app-state
   {:target (. js/document (getElementById "app0"))})
 ```
@@ -242,10 +242,10 @@ Then change the `om/root` expression to the following and save:
 
 ```clj
 (om/root
-  (fn [app owner]
+  (fn [data owner]
     (om/component 
       (apply dom/ul #js {:className "animals"}
-        (map stripe (:list app) (cycle ["#ff0" "#fff"])))))
+        (map stripe (:list data) (cycle ["#ff0" "#fff"])))))
   app-state
   {:target (. js/document (getElementById "app0"))})
 ```
@@ -283,14 +283,14 @@ Let's edit `app-state` so it looks like this:
 After `app-state` lets add the following code:
 
 ```clj
-(defn contacts-view [app owner]
+(defn contacts-view [data owner]
   (reify
     om/IRender
     (render [this]
       (dom/div nil
         (dom/h2 nil "Contact list")
         (apply dom/ul nil
-          (om/build-all contact-view (:contacts app)))))))
+          (om/build-all contact-view (:contacts data)))))))
 ```
 
 In order to build an Om component we must use `om.core/build` for a
@@ -405,7 +405,7 @@ Change `contacts-view` to the following. It's a big change, don't
 worry we'll walk through all of it.
 
 ```clj
-(defn contacts-view [app owner]
+(defn contacts-view [data owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -415,7 +415,7 @@ worry we'll walk through all of it.
       (let [delete (om/get-state owner :delete)]
         (go (loop []
           (let [contact (<! delete)]
-            (om/transact! app :contacts
+            (om/transact! data :contacts
               (fn [xs] (vec (remove #(= contact %) xs))))
             (recur))))))
     om/IRenderState
@@ -423,7 +423,7 @@ worry we'll walk through all of it.
       (dom/div nil
         (dom/h2 nil "Contact list")
         (apply dom/ul nil
-          (om/build-all contact-view (:contacts app)
+          (om/build-all contact-view (:contacts data)
             {:init-state {:delete delete}}))))))
 ```
 
@@ -497,12 +497,12 @@ Once you've seen that it basically works lets write `add-contact`, it
 should look like the following:
 
 ```clj
-(defn add-contact [app owner]
+(defn add-contact [data owner]
   (let [new-contact (-> (om/get-node owner "new-contact")
                         .-value
                         parse-contact)]
     (when new-contact
-      (om/transact! app :contacts #(conj % new-contact)))))
+      (om/transact! data :contacts #(conj % new-contact)))))
 ```
 
 We need to use `om.core/get-node` so that we can extract the value
@@ -510,7 +510,7 @@ from the text field. We'll see how we set this up, your contacts view
 should look like the following:
 
 ```clj
-(defn contacts-view [app owner]
+(defn contacts-view [data owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -520,7 +520,7 @@ should look like the following:
       (let [delete (om/get-state owner :delete)]
         (go (loop []
               (let [contact (<! delete)]
-                (om/transact! app :contacts
+                (om/transact! data :contacts
                   (fn [xs] (vec (remove #(= contact %) xs))))
                 (recur))))))
     om/IRenderState
@@ -528,11 +528,11 @@ should look like the following:
       (dom/div nil
         (dom/h2 nil "Contact list")
         (apply dom/ul nil
-          (om/build-all contact-view (:contacts app)
+          (om/build-all contact-view (:contacts data)
             {:init-state state}))
         (dom/div nil
           (dom/input #js {:type "text" :ref "new-contact"})
-          (dom/button #js {:onClick #(add-contact app owner)} "Add contact"))))))
+          (dom/button #js {:onClick #(add-contact data owner)} "Add contact"))))))
 ```
 
 Notice that the input field specified `:ref`, this is a feature of
@@ -555,11 +555,11 @@ way to clear the text field would be by changing `add-contact` to
 the following:
 
 ```clj
-(defn add-contact [app owner]
+(defn add-contact [data owner]
   (let [input (om/get-node owner "new-contact")
         new-contact (-> input .-value parse-contact)]
     (when new-contact
-      (om/transact! app :contacts #(conj % new-contact))
+      (om/transact! data :contacts #(conj % new-contact))
       (set! (.-value input) ""))))
 ```
 
@@ -572,7 +572,7 @@ its value a part of `contacts-view`'s local state. Let's change
 `contacts-view` to the following and save it:
 
 ```clj
-(defn contacts-view [app owner]
+(defn contacts-view [data owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -583,7 +583,7 @@ its value a part of `contacts-view`'s local state. Let's change
       (let [delete (om/get-state owner :delete)]
         (go (loop []
               (let [contact (<! delete)]
-                (om/transact! app :contacts
+                (om/transact! data :contacts
                   (fn [xs] (vec (remove #(= contact %) xs))))
                 (recur))))))
     om/IRenderState
@@ -591,11 +591,11 @@ its value a part of `contacts-view`'s local state. Let's change
       (dom/div nil
         (dom/h2 nil "Contact list")
         (apply dom/ul nil
-          (om/build-all contact-view (:contacts app)
+          (om/build-all contact-view (:contacts data)
             {:init-state state}))
         (dom/div nil
           (dom/input #js {:type "text" :ref "new-contact" :value (:text state)})
-          (dom/button #js {:onClick #(add-contact app owner)} "Add contact"))))))
+          (dom/button #js {:onClick #(add-contact data owner)} "Add contact"))))))
 ```
 
 Try typing in the text field.
@@ -610,7 +610,7 @@ with the user input. Let's change `contacts-view` again by adding an
 event listener to watch when the input field changes:
 
 ```clj
-(defn contacts-view [app owner]
+(defn contacts-view [data owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -621,7 +621,7 @@ event listener to watch when the input field changes:
       (let [delete (om/get-state owner :delete)]
         (go (loop []
               (let [contact (<! delete)]
-                (om/transact! app :contacts
+                (om/transact! data :contacts
                   (fn [xs] (vec (remove #(= contact %) xs))))
                 (recur))))))
     om/IRenderState
@@ -629,13 +629,13 @@ event listener to watch when the input field changes:
       (dom/div nil
         (dom/h2 nil "Contact list")
         (apply dom/ul nil
-          (om/build-all contact-view (:contacts app)
+          (om/build-all contact-view (:contacts data)
             {:init-state state}))
         (dom/div nil
           (dom/input 
             #js {:type "text" :ref "new-contact" :value (:text state)
                  :onChange #(handle-change % owner state)})
-          (dom/button #js {:onClick #(add-contact app owner)} "Add contact"))))))
+          (dom/button #js {:onClick #(add-contact data owner)} "Add contact"))))))
 ```
 
 Before saving it that let's add `handle-change` before `contacts-view`:
@@ -651,12 +651,12 @@ field again.
 Let's finally add the piece of code that clears the text field. As you see it looks like our first "easy" attempt, except that we're no longer directly manipulating a ref but we're changing the state of the app:
 
 ```clj
-(defn add-contact [app owner]
+(defn add-contact [data owner]
   (let [new-contact (-> (om/get-node owner "new-contact")
                         .-value
                         parse-contact)]
     (when new-contact
-      (om/transact! app :contacts #(conj % new-contact))
+      (om/transact! data :contacts #(conj % new-contact))
       (om/set-state! owner :text ""))))
 ```
 
@@ -742,7 +742,7 @@ Your source file should look like the following:
 (defn display-name [{:keys [first last] :as contact}]
   (str last ", " first (middle-name contact)))
 
-(defn registry-view [app owner]
+(defn registry-view [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
@@ -799,14 +799,14 @@ Finally let's fix up `registry-view`. It's succinct and we've kept it
 clean of conditionals.
 
 ```clj
-(defn registry-view [app owner]
+(defn registry-view [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:id "registry"}
         (dom/h2 nil "Registry")
         (apply dom/ul nil
-          (om/build-all entry-view (people app)))))))
+          (om/build-all entry-view (people data)))))))
 ```
 
 The only missing bit now is the `people` function. We want to make
@@ -814,12 +814,12 @@ sure to render professors with their list of actual class
 titles. Before `registry-view` write the following:
 
 ```clj
-(defn people [app]
-  (->> (:people app)
+(defn people [data]
+  (->> (:people data)
     (mapv (fn [x]
             (if (:classes x)
               (update-in x [:classes]
-                (fn [cs] (mapv (:classes app) cs)))
+                (fn [cs] (mapv (:classes data) cs)))
                x)))))
 ```
 
@@ -865,14 +865,14 @@ ul li button {
 Let's add `classes-view` after `registry-view`:
 
 ```clj
-(defn classes-view [app owner]
+(defn classes-view [data owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:id "classes"}
         (dom/h2 nil "Classes")
         (apply dom/ul nil
-          (map #(dom/li nil %) (vals (:classes app))))))))
+          (map #(dom/li nil %) (vals (:classes data))))))))
 ```
 
 Let's use it by adding a new `om/root` expression after the existing
@@ -1011,14 +1011,14 @@ a String object instead of a primitive string:
 Let's use `editable` in `classes-view`:
 
 ```clj
-(defn classes-view [app owner]
+(defn classes-view [data owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:id "classes"}
         (dom/h2 nil "Classes")
         (apply dom/ul nil
-          (om/build-all editable (vals (:classes app))))))))
+          (om/build-all editable (vals (:classes data))))))))
 ```
 
 That's it, save it. You should now be able to edit class titles in the
