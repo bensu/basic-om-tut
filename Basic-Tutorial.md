@@ -701,9 +701,7 @@ following:
   </head>
   <body>
     <div id="registry"></div>
-    <script src="js/compiled/out/goog/base.js" type="text/javascript"></script>
     <script src="js/compiled/om_tut.js" type="text/javascript"></script>
-    <script type="text/javascript">goog.require("om-tut.core");</script>
   </body>
 </html>
 ```
@@ -848,9 +846,7 @@ Let's change `resources/public/index.html` to the following:
   <body>
     <div id="registry"></div>
     <div id="classes"></div>
-    <script src="js/compiled/out/goog/base.js" type="text/javascript"></script>
     <script src="js/compiled/om_tut.js" type="text/javascript"></script>
-    <script type="text/javascript">goog.require("om-tut.core");</script>
   </body>
 </html>
 ```
