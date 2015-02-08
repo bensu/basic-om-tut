@@ -59,10 +59,10 @@ tell ring what it should run, we specify it in our `project.clj`:
 ```
 
 To understand the backend code, open `src/clj/om-async/core.clj` in
-your favorite editor. This code creates a handler that accepts requests
-to read and write to Datomic. It also serves the static files and
-the compiled JavaScript files that our ClojureScript code will
-generate. 
+your favorite editor. This code creates `om-async.core/handler` that
+accepts requests to read and write to Datomic. It also serves the
+static files and the compiled JavaScript files that our ClojureScript code will
+generate.
 
 To start it run:
 
@@ -76,7 +76,7 @@ and run:
 
     lein figwheel
     
-When it is done compiling, check if the REPL is connected by typing:
+When it is done compiling, check if the Browser REPL is connected by typing:
 
 ```
 ClojureScript:cljs.user> (js/alert "Am I connected?")
@@ -401,7 +401,7 @@ First we need to change our `project.clj` to include a dependency on
 `om-sync`.
 
 ```clj
-:dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2727"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.omcljs/om "0.8.7"]
