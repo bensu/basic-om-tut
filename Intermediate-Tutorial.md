@@ -40,34 +40,51 @@ REPL.
 
 If you got an error, try an earlier version of Datomic Free.
 
-Let's start [Figwheel](https://github.com/bhauman/lein-figwheel) and
-the auto building process:
-
-```
-lein figwheel 
-```
-
 We don't have time to cover all the details of Ring or Datomic here
 but hopefully you get the basic idea. If you're curious about Datomic
 I highly recommend Jonas Enlund's
 [tutorial](http://www.learndatalogtoday.org) and the
 [Day of Datomic](http://github.com/Datomic/day-of-datomic) tutorial.
 
-Open `src/clj/om-async/core.clj` in your favorite editor. This code
-creates a handler that accepts request to read and write to to
-Datomic. It also serves the static files and the compiled JavaScript
-files that our ClojureScript will generate. To run it we will use the
-`ring` plugin. In another terminal, run:
+We will use [Figwheel](https://github.com/bhauman/lein-figwheel) to
+reload our frontend ClojureScript while we code. Figwheel uses a
+server to auto compile our code and push it to the browser. But we
+also need a server running our backend code. For that we will use the
+`lein-ring` [plugin](https://github.com/weavejester/lein-ring). To
+tell ring what it should run, we specify it in our `project.clj`:
+
+```clj
+  :ring {:handler om-async.core/handler
+         :port 8000}
+```
+
+To understand the backend code, open `src/clj/om-async/core.clj` in
+your favorite editor. This code creates a handler that accepts requests
+to read and write to Datomic. It also serves the static files and
+the compiled JavaScript files that our ClojureScript code will
+generate. 
+
+To start it run:
+
+    lein ring server 
+
+When the compilation process is done, point your browser at
+[localhost:8000](http://localhost:8000). If you open the JavaScript
+console you should see that `main.js` is missing. That is because we
+have not compiled our Clojurescript code yet. Open another terminal
+and run:
+
+    lein figwheel
+    
+When it is done compiling, check if the REPL is connected by typing:
 
 ```
-lein ring server
+ClojureScript:cljs.user> (js/alert "Am I connected?")
 ```
 
-Now point your browser at `http://localhost:3000`. If Figwheel has
-already compiled the ClojureScript and you open the JavaScript console
-you should see `"Hello world!"` printed.
+You should see the alert in your browser. 
 
-Let's read the server side code located in
+Now let's read the server side code located in
 `src/clj/om-async/core.clj`. At the top of the file we have the usual
 namespace stuff:
 
@@ -158,13 +175,6 @@ Finally we add our EDN middleware to get our final handler:
 (def handler 
   (-> routes
       wrap-edn-params))
-```
-
-`lein ring server` knows where to find this handler because we
-specified it in `project.clj`:
-
-```clj
-:ring {:handler om-async.core/handler}
 ```
 
 Let's look at the client side portion now, open
@@ -335,7 +345,7 @@ Our `classes-view` will load the data from server on
   {:target (gdom/getElement "classes")})
 ```
 
-That's it. Save your file and refresh. You should see the list of
+That's it. Save your file. You should see the list of
 classes loaded from the server. You should be able to edit a class
 title. Press enter to commit the title change. Refresh your browser
 and you should see that the change persisted.
