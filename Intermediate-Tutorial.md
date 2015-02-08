@@ -7,8 +7,10 @@ Clojure and also provides time travel capabilities making it quite
 nice to pair with Om.
 
 First download a copy of
-[Datomic Free](http://my.datomic.com/downloads/free). You might get an error with versions of Datomic later than `0.9.4609`, so try that one first (seems to be working as of `0.9.4699`). Unzip it and run
-the following inside the directory:
+[Datomic Free](http://my.datomic.com/downloads/free). You might get an
+error with versions of Datomic later than `0.9.5130`, so try that one
+first (seems to be working as of `0.9.5130`). Unzip it and run the
+following inside the directory:
 
 ```
 bin/transactor config/samples/free-transactor-template.properties
@@ -38,10 +40,11 @@ REPL.
 
 If you got an error, try an earlier version of Datomic Free.
 
-Let's start the auto building process:
+Let's start [Figwheel](https://github.com/bhauman/lein-figwheel) and
+the auto building process:
 
 ```
-lein cljsbuild auto dev
+lein figwheel 
 ```
 
 We don't have time to cover all the details of Ring or Datomic here
@@ -50,13 +53,23 @@ I highly recommend Jonas Enlund's
 [tutorial](http://www.learndatalogtoday.org) and the
 [Day of Datomic](http://github.com/Datomic/day-of-datomic) tutorial.
 
-Let's read some code. Open `src/clj/om-async/core.clj` in Light
-Table. Type "Shift-Command-Enter" to evaluate the entire file. This
-will start up the web server. You should be able to point your browser
-at `http://localhost:8080`. If you open the JavaScript console you
-should see `"Hello world!"` printed.
+Open `src/clj/om-async/core.clj` in your favorite editor. This code
+creates a handler that accepts request to read and write to to
+Datomic. It also serves the static files and the compiled JavaScript
+files that our ClojureScript will generate. To run it we will use the
+`ring` plugin. In another terminal, run:
 
-At the top of the file we have the usual namespace stuff:
+```
+lein ring server
+```
+
+Now point your browser at `http://localhost:3000`. If Figwheel has
+already compiled the ClojureScript and you open the JavaScript console
+you should see `"Hello world!"` printed.
+
+Let's read the server side code located in
+`src/clj/om-async/core.clj`. At the top of the file we have the usual
+namespace stuff:
 
 ```clj
 (ns om-async.core
@@ -139,24 +152,30 @@ We then have our `routes`:
   (route/files "/" {:root "resources/public"}))
 ```
 
-Finally we add our EDN middleware and start our server:
+Finally we add our EDN middleware to get our final handler:
 
 ```clj
-(def app
+(def handler 
   (-> routes
       wrap-edn-params))
+```
 
-(defonce server
-  (run-jetty #'app {:port 8080 :join? false}))
+`lein ring server` knows where to find this handler because we
+specified it in `project.clj`:
+
+```clj
+:ring {:handler om-async.core/handler}
 ```
 
 Let's look at the client side portion now, open
-`src/cljs/om-async/core.cljs` in Light Table. The `ns` form should
-look familiar, and we enable `console.log` printing:
+`src/cljs/om-async/core.cljs` in your editor. The `ns` form should
+look familiar, and we enable `console.log` printing. The last line is
+what tells Figwheel that we want to do code reloading:
 
 ```clj
 (ns om-async.core
   (:require [cljs.reader :as reader]
+            [figwheel.client :as fw]
             [goog.events :as events]
             [goog.dom :as gdom]
             [om.core :as om :include-macros true]
@@ -166,6 +185,10 @@ look familiar, and we enable `console.log` printing:
            [goog.events EventType]))
 
 (enable-console-print!)
+
+(println "Hello world!")
+
+(fw/start {:websocket-url "ws://localhost:3449/figwheel-ws"})
 ```
 
 We're going to use simple callbacks in this tutorial instead of
