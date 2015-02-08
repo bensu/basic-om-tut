@@ -401,18 +401,19 @@ First we need to change our `project.clj` to include a dependency on
 `om-sync`.
 
 ```clj
-:dependencies [[org.clojure/clojure "1.5.1"]
-               [org.clojure/clojurescript "0.0-2173"]
-               [ring/ring "1.2.1"]
-               [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
-               [om "0.5.3"]
-               [om-sync "0.1.1"] ;; <=== ADD THIS
-               [compojure "1.1.6"]
-               [fogus/ring-edn "0.2.0"]
-               [com.datomic/datomic-free "0.9.4699"]]
+:dependencies [[org.clojure/clojure "1.6.0"]
+                 [org.clojure/clojurescript "0.0-2727"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [org.omcljs/om "0.8.7"]
+                 [om-sync "0.1.1"] ;; <=== ADD THIS
+                 [ring "1.3.2"]
+                 [compojure "1.3.1"]
+                 [figwheel "0.2.2-SNAPSHOT"]
+                 [fogus/ring-edn "0.2.0"]
+                 [com.datomic/datomic-free "0.9.5130" :exclusions [joda-time]]]
 ```
 
-Lets update the server side code to uniformly handle EDN requests.
+Let's update the server side code to uniformly handle EDN requests.
 
 After `generate-response` let's add `get-classes`:
 
@@ -495,13 +496,13 @@ And let's provide the new routes:
   (route/files "/" {:root "resources/public"}))
 ```
 
-Evaluate everything with Shift-Command-Enter, that's it for our server
-side code. Let's update the client code.
+Since we modified our `ns` declaration you might need to restart `lein
+ring server`. That's it for our server side code. Let's update the
+client code.
 
 #### Updating the Client
 
-If you have a `lein cljsbuild auto dev` process running, kill it and
-restart. This is because our dependencies have changed.
+You should also restart `lein figwheel` since our our dependencies have changed.
 
 First we need to modify the namespace form. Since we'll be using
 `om-sync` we clean up some things:
@@ -510,6 +511,7 @@ First we need to modify the namespace form. Since we'll be using
 (ns om-async.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :as async :refer [put! chan alts!]]
+            [figwheel.client :as fw]
             [goog.dom :as gdom]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
