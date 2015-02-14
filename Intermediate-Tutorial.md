@@ -1,6 +1,6 @@
 For this next tutorial we're going to get a bit more
 ambitious. We're going to build an Om frontend to a simple
-[Ring](http://github.com/ring-clojure) application that talks to
+[Ring](http://github.com/ring-clojure) + [Compojure](https://github.com/weavejester/compojure) application that talks to
 [Datomic](http://datomic.com) for persistence. You can of course swap
 in another database, but Datomic is particularly easy to use from
 Clojure and also provides time travel capabilities making it quite
@@ -49,13 +49,12 @@ I highly recommend Jonas Enlund's
 We will use [Figwheel](https://github.com/bhauman/lein-figwheel) to
 reload our frontend ClojureScript while we code. Figwheel uses a
 server to auto compile our code and push it to the browser. But we
-also need a server running our backend code. For that we will use the
-`lein-ring` [plugin](https://github.com/weavejester/lein-ring). To
-tell ring what it should run, we specify it in our `project.clj`:
+also need a server running our backend code. To simplify things, we
+will configure Figwheel in our `project.clj` to also serve our
+customer handler:
 
 ```clj
-  :ring {:handler om-async.core/handler
-         :port 8000}
+  :figwheel {:ring-handler om-async.core/handler}
 ```
 
 To understand the backend code, open `src/clj/om-async/core.clj` in
@@ -64,19 +63,13 @@ accepts requests to read and write to Datomic. It also serves the
 static files and the compiled JavaScript files that our ClojureScript code will
 generate.
 
-To start it run:
+To start both the server and the compilation process, run:
 
-    lein ring server 
+    lein figwheel 
 
-When the compilation process is done, point your browser at
-[localhost:8000](http://localhost:8000). If you open the JavaScript
-console you should see that `main.js` is missing. That is because we
-have not compiled our Clojurescript code yet. Open another terminal
-and run:
-
-    lein figwheel
-    
-When it is done compiling, check if the Browser REPL is connected by typing:
+When the server is up, point your browser at
+[localhost:3449](http://localhost:3449). When it is done compiling,
+check if the Browser REPL is connected by typing:
 
 ```
 ClojureScript:cljs.user> (js/alert "Am I connected?")
@@ -187,7 +180,6 @@ what tells Figwheel that we want to do code reloading:
   (:require [cljs.reader :as reader]
             [figwheel.client :as fw]
             [goog.events :as events]
-            [goog.dom :as gdom]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true])
   (:import [goog.net XhrIo]
@@ -198,7 +190,7 @@ what tells Figwheel that we want to do code reloading:
 
 (println "Hello world!")
 
-(fw/start {:websocket-url "ws://localhost:3449/figwheel-ws"})
+(fw/start {})
 ```
 
 We're going to use simple callbacks in this tutorial instead of
@@ -342,7 +334,7 @@ Our `classes-view` will load the data from server on
             (:classes app)))))))
 
 (om/root classes-view app-state
-  {:target (gdom/getElement "classes")})
+  {:target (.getElementById js/document "classes")})
 ```
 
 That's it. Save your file. You should see the list of
@@ -402,13 +394,13 @@ First we need to change our `project.clj` to include a dependency on
 
 ```clj
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2727"]
+				 [org.clojure/clojurescript "0.0-2850"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [org.omcljs/om "0.8.7"]
-                 [om-sync "0.1.1"] ;; <=== ADD THIS
+                 [org.omcljs/om "0.8.8"]
+                 [om-sync "0.1.22"]
                  [ring "1.3.2"]
                  [compojure "1.3.1"]
-                 [figwheel "0.2.2-SNAPSHOT"]
+                 [figwheel "0.2.4-SNAPSHOT"]
                  [fogus/ring-edn "0.2.0"]
                  [com.datomic/datomic-free "0.9.5130" :exclusions [joda-time]]]
 ```
@@ -497,12 +489,10 @@ And let's provide the new routes:
 ```
 
 Since we modified our `ns` declaration you might need to restart `lein
-ring server`. That's it for our server side code. Let's update the
+figwheel`. That's it for our server side code. Let's update the
 client code.
 
 #### Updating the Client
-
-You should also restart `lein figwheel` since our our dependencies have changed.
 
 First we need to modify the namespace form. Since we'll be using
 `om-sync` we clean up some things:
@@ -512,7 +502,6 @@ First we need to modify the namespace form. Since we'll be using
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :as async :refer [put! chan alts!]]
             [figwheel.client :as fw]
-            [goog.dom :as gdom]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [om-sync.core :refer [om-sync]]
@@ -543,7 +532,7 @@ very bottom of the page.
      (fn [res]
        (reset! app-state res)
        (om/root app-view app-state
-         {:target (gdom/getElement "classes")
+         {:target (.getElementById js/document "classes") 
           :shared {:tx-chan tx-pub-chan}
           :tx-listen
           (fn [tx-data root-cursor]
@@ -713,3 +702,6 @@ incidental complexity.
 Having made it this far you can probably read through the `om-sync`
 source yourself and hopefully be inspired to send a pull request to
 improve so it can be leveraged in more contexts.
+
+In case you run intro trouble, you can find the final version of the
+code [here](https://github.com/bensu/om-intermediate-tut)
