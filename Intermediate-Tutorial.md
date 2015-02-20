@@ -19,10 +19,10 @@ bin/transactor config/samples/free-transactor-template.properties
 This will start up the Datomic transactor.
 
 Now in some other directory run the following to generate the tutorial
-from the `om-intermedaite-template` Lein template:
+from the `om-intermediate-template` Lein template:
 
 ```
-lein new om-intermedaite-template om-async
+lein new om-intermediate-template om-async
 ```
 
 `cd` into `om-async` and launch a Lein repl with `lein repl`. Once the
@@ -68,7 +68,7 @@ To start it run:
 
     lein ring server 
 
-When the compilation process is done, point your browser at
+When the server is up, point your browser at
 [localhost:8000](http://localhost:8000). If you open the JavaScript
 console you should see that `main.js` is missing. That is because we
 have not compiled our Clojurescript code yet. Open another terminal
@@ -113,7 +113,7 @@ We then define our main route handler `index`:
   (file-response "public/html/index.html" {:root "resources"}))
 ```
 
-Instead of [JSON](http://www.json.org) as a data format we'll
+Instead of [JSON](http://www.json.org) as a data format, we'll
 use [EDN](http://github.com/edn-format/edn). We write a little helper
 for the EDN middleware we'll be using:
 
@@ -124,7 +124,7 @@ for the EDN middleware we'll be using:
    :body (pr-str data)})
 ```
 
-Now let's take a look at `classes`:
+Skip ahead briefly and let's take a look at `classes`:
 
 ```clj
 (defn classes []
@@ -140,7 +140,7 @@ Now let's take a look at `classes`:
 
 This just finds all the classes and returns an EDN response.
 
-Now we have `update-class`. It finds a class by id and modifies the
+Back up and look at `update-class`. It finds a class by id and modifies the
 title:
 
 ```clj
@@ -283,7 +283,7 @@ This is `editable`:
             #js {:style (display editing)
                  :value text
                  :onChange #(handle-change % data edit-key owner)
-                 :onKeyPress #(when (== (.-keyCode %) 13)
+                 :onKeyDown #(when (= (.-key %) "Enter")
                                 (end-edit text owner on-edit))
                  :onBlur (fn [e]
                            (when (om/get-state owner :editing)
@@ -596,7 +596,7 @@ without the transaction tag, but not as simply.
             #js {:style (display editing)
                  :value text
                  :onChange #(handle-change % data edit-key owner)
-                 :onKeyPress #(when (== (.-keyCode %) 13)
+                 :onKeyDown #(when (= (.-key %) "Enter")
                                 (end-edit data edit-key text owner on-edit))
                  :onBlur (fn [e]
                            (when (om/get-state owner :editing)

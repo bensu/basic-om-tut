@@ -497,7 +497,7 @@ for detecting state transitions.
   ...)
 ```
 
-Given a DOM target remove its render loop if one exists.
+Given a DOM target, remove its render loop if one exists.
 
 ### root-cursor
 
@@ -506,7 +506,7 @@ Given a DOM target remove its render loop if one exists.
   ...)
 ```
 
-Given an application state atom return a root cursor for it.
+Given an application state atom, return a root cursor for it.
 
 ### ref-cursor
 
@@ -515,7 +515,7 @@ Given an application state atom return a root cursor for it.
   ...)
 ```
 
-Given a cursor return a reference cursor that inherits all of the
+Given a cursor, return a reference cursor that inherits all of the
 properties and methods of the cursor. Reference cursors may be
 observed via `om.core/observe`.
 
@@ -526,7 +526,7 @@ observed via `om.core/observe`.
   ...)
 ```
 
-Given a component and a reference cursor have the component observe
+Given a component and a reference cursor, have the component observe
 the reference cursor for any data changes.  Evaluates to the given reference cursor.
   
 ## Macros

@@ -1,7 +1,9 @@
 This tutorial assumes familiarity with Clojure or ClojureScript. If
 you are not familiar with them, we recommend going through the
 [ClojureScript tutorial for Light Table](http://github.com/swannodette/lt-cljs-tutorial)
-first. We will use
+first. If you are entirely new to Om, you may also benefit from a quick look through the [Conceptual overview](https://github.com/omcljs/om/wiki/Conceptual-overview).
+
+We will use
 [Figwheel](https://github.com/bhauman/lein-figwheel) to 
 easily get an interactive environment for ClojureScript and Om.
 Figwheel does two things:
@@ -229,7 +231,7 @@ In Om you have the full power of the ClojureScript language when building
 your user interface. At the same time, Om leaves the door open for
 alternate syntaxes for describing the DOM if that's your cup of tea.
 
-Let's edit our code so we get zebra striping on the list. Lets add a
+Let's edit our code so we get zebra striping on the list. Let's add a
 helper function `stripe` before the `om/root` expression:
 
 ```clj
@@ -280,7 +282,7 @@ Let's edit `app-state` so it looks like this:
       {:first "Lem" :middle-initial "E" :last "Tweakit" :email "morebugs@mit.edu"}]}))
 ```
 
-After `app-state` lets add the following code:
+After `app-state` let's add the following code:
 
 ```clj
 (defn contacts-view [data owner]
@@ -493,7 +495,7 @@ lein clean
 
 ... restarting Figwheel and refreshing the browser will clear the problem.
 
-Once you've seen that it basically works lets write `add-contact`, it
+Once you've seen that it basically works, let's write `add-contact`. It
 should look like the following:
 
 ```clj
@@ -749,9 +751,13 @@ Your source file should look like the following:
       (dom/div nil
         (dom/h2 nil "Registry")))))
 
-(defn main []
-  (om/root registry-view app-state
-    {:target (. js/document (getElementById "registry"))}))
+(om/root registry-view app-state
+  {:target (. js/document (getElementById "registry"))})
+
+(fw/start {
+  :on-jsload (fn []
+               ;; (stop-and-start-my app)
+               )})
 ```
 
 Now what we want is for `registry-view` to render different views for
@@ -801,8 +807,8 @@ clean of conditionals.
 ```clj
 (defn registry-view [data owner]
   (reify
-    om/IRenderState
-    (render-state [_ state]
+    om/IRender
+    (render [_]
       (dom/div #js {:id "registry"}
         (dom/h2 nil "Registry")
         (apply dom/ul nil
@@ -815,7 +821,8 @@ titles. Before `registry-view` write the following:
 
 ```clj
 (defn people [data]
-  (->> (:people data)
+  (->> data
+    :people
     (mapv (fn [x]
             (if (:classes x)
               (update-in x [:classes]
